@@ -1,0 +1,9 @@
+php artisan config:cache если обн переменные
+php artisan serve запуск сервера
+composer create-project laravel/laravel example-app  сзд проекта
+php artisan make:controller Name+Controller по-хорошему туда пихать роут
+php artisan make:model Name+Model -m (migration) после бд
+
+php artisan migrate применение sql запросов к бд
+
+php artisan storage:link     public файлы к ним создается символ. ссылка
