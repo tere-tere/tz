@@ -49,12 +49,15 @@
         </tr>
     </thead>
     <tbody>
+        {{-- time=phone нужен  чтобы не подменили --}}
         @foreach($clients_car as $client_car)
             <tr>
                 <td>{{$client_car->fio}}</td>
                 <td>{{$client_car->gender}}</td>
                 <td>{{$client_car->phone}}</td>
-                <td>{{$client_car->address}}</td>
+                <td>{{$client_car->address}}
+                    <input class="hidden" type="hidden" name="time" value={{$client_car->time}}>
+                </td>
             </tr>
         @endforeach
     </tbody>
@@ -67,29 +70,78 @@
        
 
     </div>
-        
+
     <script>
+        var last_index= 0;
+
+        function CreateTablesCars(cars)
+        {
+            $('#car_clients').html('');
+
+            cars.forEach(function(car,index){
+                let table ='<div id=car' + index + '>' + "<form action={{route('change_cip')}} method='POST' id=form" + index +  ">" + '@csrf' + "</form>";
+                table+= '<table class="table align-middle mb-0 bg-white text-center">';
+                table+='<thead class="bg-light"> <tr> <th>Марка</th> <th>Модель</th> <th>Цвет</th> <th>Госномер</th> <th>Присутствие машины</th> </tr> </thead>'
+                table+='<tr>';
+
+                    table +='<td>' + car['mark'] + '</td>';
+                    table +='<td>' + car['model'] + '</td>';
+                    table +='<td>' + car['color'] + '</td>';
+                    table +='<td>' + car['gos_number'] + '</td>';
+                    table +='<td>' + '<input class="hidden" type="hidden" name="time" value=' + car['time']  + ' form=form' + index +  '>';
+                    table +='<input type="hidden" name="car_in_place" value="off">';
+                    table +='<input class=form-check-input" name="car_in_place" type="checkbox" id="gridCheck1" value="on" form=form' + index  + ' ' + ((car['car_in_place'] == 1) ? 'checked' : 'unchecked') +  '></td>';
+                    table +='<td>' + '<button type="submit" name="btn_del"  class="btn btn-light" value="save" width="35px" height="35px" form=form' + index + ">" + "Сохранить</button>" + '</td>';
+
+                table+='</tr>';
+                table+='</table>';
+                table+='</div><br>';
+                $('#car_clients').append(table);
+                last_index = index;
+            });
+        };
+        
+        function CreateAddCarTable(time)
+        {
+            last_index+=1;
+            let table ='<br><div id=car' + last_index + '>' + "<form action={{route('add_car')}} method='POST' id=form" + last_index +  ">" + '@csrf' + "</form>";
+                table+= '<table class="table align-middle mb-0 bg-white text-center">';
+                table+='<thead class="bg-light"> <tr> <th>Марка</th> <th>Модель</th> <th>Цвет</th> <th>Госномер</th> <th>Присутствие машины</th> </tr> </thead>'
+                table+='<tr>';
+
+                    table+= '<td>' + '<input type="text" name="mark" class="form-control" id="inputAddress1" placeholder="Audi" form=form' + last_index  + '></td>';
+                    table+= '<td>' + '<input type="text" name="model" class="form-control" id="inputAddress2" placeholder="S1" form=form' + last_index + '></td>';
+                    table+= '<td>' + '<input type="text" name="color" class="form-control" id="inputAddress3" placeholder="Черный" form=form' + last_index + '></td>';
+                    table+= '<td>' + '<input type="text" name="gos_number" class="form-control" id="inputAddress4" placeholder="В732ГГ 34" form=form' + last_index + '></td>';
+                    table +='<td>' + '<input class="hidden" type="hidden" name="time" value=' + time + ' form=form' + last_index +  '>';
+                    table +='<input type="hidden" name="car_in_place" value="off">';
+                    table +='<input class=form-check-input" name="car_in_place" type="checkbox" id="gridCheck1" value="on" form=form' + last_index + 'checked></td>';
+                    table +='<td>' + '<button type="submit" name="btn_del"  class="btn btn-light" value="save" width="35px" height="35px" form=form' + last_index + ">" + "Добавить</button>" + '</td>';
+
+                table+='</tr>';
+                table+='</table>';
+                table+='</div>';
+            $('#car_clients').append(table);
+        }
         // selected row in table
         $('#client_table').on('click', 'tbody tr', function(event) {
             $(this).addClass('table-success').siblings().removeClass('table-success');
 
-            //send gos_number get car client
-            let phone = this.getElementsByTagName('td')[2].innerHTML;
-
+            //send time get car client
+            let time = this.getElementsByTagName('td')[3].getElementsByTagName('input')[0].value;
             let token = '@csrf';
             token = token.substr(42, 40);
             $.ajax({
                 type: "GET",
                 url: `{{ route('get_car') }}`,
-                data: {'_token':token ,'phone':phone},
+                data: {'_token':token ,'phone':time},
                 success: function(response)
                 {
                     // console.log(response);
-                    $('#car_clients').html('');
-                    $('#car_clients').append(response);
+                    CreateTablesCars(response['cars']);
+                    CreateAddCarTable(response['time']);
                 }
-
-                });
+            });
         });
         
         //add search,scroll, off nav to table clients
@@ -98,7 +150,7 @@
             "searching": true,
             "bPaginate": false,
             "pageLength":2,
-            "scrollY": '150px',
+            "scrollY": '250px',
             "scrollCollapse": true,
              "paging": false,
 

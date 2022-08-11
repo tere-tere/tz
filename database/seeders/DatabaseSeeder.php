@@ -3,6 +3,9 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\ClientCars;
+use App\Models\CLients;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,6 +17,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call([
+            // ClientsSeeder::class,
+            ClientCarsSeeder::class
+            ]);
+        // ClientsModel::factory()->create();
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([

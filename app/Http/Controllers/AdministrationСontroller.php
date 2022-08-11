@@ -10,17 +10,17 @@ class AdministrationСontroller extends Controller
     public function GetRules()
     {
         return $rules = [
-            'fio'=>'required|min:3|max:100|regex:/^[а-яА-Я\s]+$/u',
+            'fio'=>'required|min:3|max:100|regex:/^[а-яА-ЯА-ЯёЁ\s]+$/u',
             'gender'=> 'required',
             'phone'=> 'required|min:11|max:15|regex:/^([0-9]*)$/|unique:clients,phone',
-            'address'=> 'required|max:100|regex:/^([0-9\А-Яа-я\s\.]*)$/u',
-            'mark' => 'required|min:2|max:50|regex:/^[a-zA-Zа-яА-Я]+$/u',
-            'model' => 'required|max:50|regex:/^[0-9\s\a-zA-Zа-яА-Я]+$/u',
-            'color' => 'required|max:50|regex:/^[a-zA-Zа-яА-Я]+$/u',
+            'address'=> 'required|max:100|regex:/^([0-9\А-Яа-яА-ЯёЁ\s\.\,\-]*)$/u',
+            'mark' => 'required|min:2|max:50|regex:/^[a-zA-Zа-яА-ЯА-ЯёЁ\(\)\s]+$/u',
+            'model' => 'required|max:50|regex:/^[0-9\s\a-zA-Zа-яА-ЯА-ЯёЁ]+$/u',
+            'color' => 'required|max:50|regex:/^[a-zA-Zа-яА-ЯА-ЯёЁ]+$/u',
             'gos_number' => 'required|max:9|unique:client_cars,gos_number',
-            'cars.*.mark'=> 'required|min:2|max:50|regex:/^[a-zA-Zа-яА-Я]+$/u',
-            'cars.*.model'=> 'required|max:50|regex:/^[0-9\s\a-zA-Zа-яА-Я]+$/u',
-            'cars.*.color'=> 'required|max:50|regex:/^[a-zA-Zа-яА-Я]+$/u',
+            'cars.*.mark'=> 'required|min:2|max:50|regex:/^[a-zA-Zа-яА-ЯА-ЯёЁ\(\)\s]+$/u',
+            'cars.*.model'=> 'required|max:50|regex:/^[0-9\s\a-zA-Zа-яА-ЯА-ЯёЁ]+$/u',
+            'cars.*.color'=> 'required|max:50|regex:/^[a-zA-Zа-яА-ЯА-ЯёЁ]+$/u',
             'cars.*.gos_number'=> 'required|max:9|unique:client_cars,gos_number',
         ];
     }
@@ -88,14 +88,14 @@ class AdministrationСontroller extends Controller
     public function EditClient(Request $req)
     {
         //set new rules
+       
         $rules = $this->GetRules();
         $rules['phone']  = 'required|min:11|max:15|regex:/^([0-9]*)$/|';
         $rules['gos_number'] = 'required|max:9';
-        $rules['add_cars.*.mark'] = 'required|min:2|max:50|regex:/^[a-zA-Zа-яА-Я]+$/u';
-        $rules['add_cars.*.model'] = 'required|max:50|regex:/^[0-9\s\a-zA-Zа-яА-Я]+$/u';
-        $rules['add_cars.*.color'] = 'required|max:50|regex:/^[a-zA-Zа-яА-Я]+$/u';
+        $rules['add_cars.*.mark'] = 'required|min:2|max:50|regex:/^[a-zA-Zа-яА-ЯА-ЯёЁ\(\)\s]+$/u';
+        $rules['add_cars.*.model'] = 'required|max:50|regex:/^[0-9\s\a-zA-Zа-яА-ЯА-ЯёЁ]+$/u';
+        $rules['add_cars.*.color'] = 'required|max:50|regex:/^[a-zA-Zа-яА-ЯА-ЯёЁ]+$/u';
         $rules['add_cars.*.gos_number'] = 'required|max:9|unique:client_cars,gos_number';
-        $rules['add_cars.*.car_in_place'] = 'required';
 
         $validator = Validator::make($req->all(), $rules);
         $old_phone = Crypt::decryptString($req->date);
@@ -200,10 +200,11 @@ class AdministrationСontroller extends Controller
     }
     public function GetClients()    
     {
+        //paginate(?) сколько выводить клиентов 
         $clients = DB::table('clients')
                         ->join('client_cars','clients.id_client_car','=','client_cars.id_client_car')
                         ->select('clients.fio','clients.phone','client_cars.mark','client_cars.gos_number')
-                        ->paginate(3);
+                        ->paginate(5);
 
         return $clients;
     }
