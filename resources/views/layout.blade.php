@@ -13,10 +13,30 @@
 <body>
     <nav class="py-2 bg-light border-bottom">
         <div class="container d-flex flex-wrap justify-content-center">
-        <ul class="nav me-auto">
-            <li class="nav-item"><a href="/administration" class="nav-link link-dark px-2">Администрирование</a></li>
-            <li class="nav-item"><a href="/view_autopark" class="nav-link link-dark px-2">Просмотр Автостоянки</a></li>
-        </ul>
+        <nav class="nav ">
+            <a href="/administration" class="nav-link link-dark px-2">Администрирование</a>
+            <a href="/view_autopark" class="nav-link link-dark px-2">Просмотр Автостоянки</a>
+            
+            <form class="mt-2" method="POST" action="{{ route('logout') }}">
+                @csrf
+                <!-- {{ Auth::user()->name }} -->
+                <!-- <a href="" class="nav-link link-red">{{ Auth::user()->name }}</a> -->
+                <x-dropdown-link :href="route('logout')" class='' onclick="event.preventDefault(); this.closest('form').submit();">
+                    {{ Auth::user()->name }}
+                </x-dropdown-link>
+            </form> 
+        </nav>
+
+        <!-- {{ Auth::user()->name }}
+        </div>
+                          
+                        <!-- Authentication -->
+                        <!-- <form method="POST" action="{{ route('logout') }}"> -->
+                            <!-- @csrf -->
+<!--  -->
+                                <!-- {{ __('Log Out') }} -->
+                        <!-- </form> --> 
+            </div>
         </div>
     </nav>
 
