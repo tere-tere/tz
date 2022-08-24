@@ -32,7 +32,6 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/view_autopark/change_cip',[ViewAutoParkСontroller::class,'ChangeCarInPlace'])->name('change_cip');
     Route::post('/view_autopark/add_car',[ViewAutoParkСontroller::class,'AddCar'])->name('add_car');
     
-    
     Route::get('/', function () {
         return redirect('administration'); //view('dashboard');
     })->name('dashboard');

@@ -59,7 +59,6 @@ class ViewAutoParkСontroller extends Controller
     }
     public function GetRules()
     {
-
         return $rules = [
             'mark' => 'required|min:2|max:50|regex:/^[a-zA-Zа-яА-ЯёЁ]+$/u',
             'model' => 'required|max:50|regex:/^[0-9\s\a-zA-Zа-яА-ЯёЁ]+$/u',
