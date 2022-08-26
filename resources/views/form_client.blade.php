@@ -4,7 +4,7 @@
 
 
 @section('layout_content')
-<form action="@yield('form_client_route')" m ethod="POST">
+<form action="@yield('form_client_route')" method="POST">
     @csrf
     <!-- это нужно, чтоб нельзя было подделать и сделать проверку -->
     <input type="hidden" id="old_fio name="old_fio" value="{{$data->fio}}">
@@ -67,7 +67,7 @@
     <br>
     <h2 class="bg-primary text-white p-3 mb-2">Машина клиента</h2>
 
-    
+
     <div class="form-row">
         <div class='col-6'>
             <label for="inputAddress2">Марка</label>
@@ -92,7 +92,7 @@
 
     <br>
     <div class="form-group row">
-        <div class="col-sm-2">Статус автомобиля</div>   
+        <div class="col-sm-2">Статус автомобиля</div>
         <div class="form-check">
             <input class="form-check-input" name='car_in_place' type="checkbox" id="gridCheck1" checked="{{$data->car_in_place}}">
         </div>

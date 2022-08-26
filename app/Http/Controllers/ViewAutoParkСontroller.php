@@ -10,22 +10,23 @@ class ViewAutoParkСontroller extends Controller
 {
     public function ViewAutoPark()
     {
-        return view('view_autopark',['clients_car'=>$this->GetClientsAndCar()]);
+//        return view('view_autopark',['clients_car'=>$this->GetClientsAndCar()]);
+        return view('view_autopark');
     }
-    public function GetClientsAndCar()
+    public function GetClients()
     {
-        $clients_car = DB::table('clients')
+        $clients = DB::table('clients')
                         ->select('fio','gender','phone','address')
                         ->get();
-        
+
 
         //тут шифруем телефоны и там добавляем в таблицу, чтоб нельзя было подменить
-        foreach($clients_car as $client)
+        foreach($clients as $client)
         {
             $client->time = Crypt::encryptString($client->phone);
         }
 
-        return $clients_car;
+        return $clients;
     }
 
     public function ChangeCarInPlace(Request $req)
@@ -37,8 +38,9 @@ class ViewAutoParkСontroller extends Controller
     public function GetDefinedCar(Request $req)
     {
         //при запросе(с арг телефоном) выдает все машины килента
+        //phone = time
         $id_client_car = DB::table('clients')
-                            ->where('clients.phone','=',  Crypt::decryptString($req->phone))
+                            ->where('clients.phone','=',  Crypt::decryptString($req->time))
                             ->get('id_client_car')[0]->id_client_car;
 
         $cars = DB::table('client_cars')
@@ -55,7 +57,7 @@ class ViewAutoParkСontroller extends Controller
         }
 
         //phone нужен для add form чтоб нельзя было подменить клиента
-        return  ['cars'=>$cars,'time'=>$req->phone];
+        return  ['cars'=>$cars,'time'=>$req->time];
     }
     public function GetRules()
     {
@@ -71,7 +73,7 @@ class ViewAutoParkСontroller extends Controller
         //проверка
         $validator = Validator::make($req->all(), $this->GetRules());
         if ($validator->fails()) {
-            return back()->withErrors($validator->errors())->withInput();
+            return response($validator->errors())->setStatusCode(500);//back()->withErrors($validator->errors())->withInput();
         }
         //time = phone
         $id_client_car = DB::table('clients')
@@ -84,7 +86,7 @@ class ViewAutoParkСontroller extends Controller
             'model'=> $req->model,
             'color'=> $req->color,
             'gos_number'=> $req->gos_number,
-            'car_in_place'=> ($req->car_in_place == 'on') ? 1 : 0
+            'car_in_place'=> $req->car_in_place ? 1 : 0
         ];
 
         DB::table('client_cars')->insert($data);

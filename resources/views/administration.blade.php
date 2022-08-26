@@ -12,6 +12,7 @@
                 </ul>
         </div>
     @endif
+
     <!-- init table -->
     <table class="table align-middle mb-0 bg-white text-center">
         <thead class="bg-light">
@@ -55,9 +56,9 @@
         </td>
         </tr>
     @endforeach
-    </table>   
+    </table>
 
-    <div class="row "> 
+    <div class="row ">
         {{--call pagination --}}
         <div class="col float-left">
             {{$clients->links()}}
@@ -71,7 +72,7 @@
         </div>
     </div>
 
-    
+
 
     <div>
     </div>

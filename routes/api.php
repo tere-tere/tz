@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ViewAutoParkСontroller;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +18,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/view_autopark/get_clients',[ViewAutoParkСontroller::class,'GetClients']);
+Route::get('/view_autopark/get_car',[ViewAutoParkСontroller::class,'GetDefinedCar']);
+Route::post('/view_autopark/change_cip',[ViewAutoParkСontroller::class,'ChangeCarInPlace']);
+Route::post('/view_autopark/add_car',[ViewAutoParkСontroller::class,'AddCar']);
+
