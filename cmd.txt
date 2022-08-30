@@ -9,3 +9,4 @@ php artisan migrate применение sql запросов к бд
 php artisan storage:link     public файлы к ним создается символ. ссылка
 php artisan make:seeder Name+Seeder заполнение бд рандомные данными
 php artisan make:factory Name+Factory тут происходит генерация данных и потом вызов в seed
+php artisan db:seed сеять бд(заполнять рандомными данными)

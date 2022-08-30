@@ -4,7 +4,7 @@
 
     </clients>
 
-    <cars :cars="cars" :time="time">
+    <cars :cars="cars" :id="id">
 
     </cars>
 </template>
@@ -18,25 +18,25 @@ export default {
     components: {
         Clients,
         Cars
- 
+
     },
     methods:{
         HandlerClientSelectedRow(id){
 
             axios.get('/api/view_autopark/get_car', {
                 params: {
-                    time: id
+                    id: id
                 }
             }).then(response => {
                 this.cars = response.data['cars'];
-                this.time = response.data['time'];
+                this.id = response.data['id'];
             });
         }
     },
     data() {
         return {
             cars: [],
-            time:null
+            id:null
         };
     }
 }

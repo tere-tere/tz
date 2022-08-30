@@ -16,7 +16,6 @@ class ViewAutoParkСontroller extends Controller
     public function GetClients()
     {
         $clients = DB::table('clients')
-                        ->select('fio','gender','phone','address')
                         ->get();
 
 
@@ -31,20 +30,20 @@ class ViewAutoParkСontroller extends Controller
 
     public function ChangeCarInPlace(Request $req)
     {
-        $gos_number =  Crypt::decryptString($req->time);
-        DB::table('client_cars')->where('client_cars.gos_number','=',$gos_number)->update(['client_cars.car_in_place'=>($req->car_in_place == 'on') ? 1 : 0]);
-        return back()->withInput();
+
+        DB::table('client_cars')->where('client_cars.gos_number','=',$req->gos_number)->update(['client_cars.car_in_place'=>($req->car_in_place) ? 1 : 0]);
+        return response()->json(['status'=>'Машина добавлена!']);
     }
     public function GetDefinedCar(Request $req)
     {
         //при запросе(с арг телефоном) выдает все машины килента
         //phone = time
-        $id_client_car = DB::table('clients')
-                            ->where('clients.phone','=',  Crypt::decryptString($req->time))
-                            ->get('id_client_car')[0]->id_client_car;
+        $client_id = DB::table('clients')
+                            ->where('clients.id','=',  $req->id)
+                            ->get('id')[0]->id;
 
         $cars = DB::table('client_cars')
-                            ->where('client_cars.id_client_car','=',$id_client_car)
+                            ->where('client_cars.client_id','=',$client_id)
                             ->select('client_cars.mark','client_cars.model','client_cars.color','client_cars.gos_number','client_cars.car_in_place')
                             ->get();
 
@@ -57,7 +56,7 @@ class ViewAutoParkСontroller extends Controller
         }
 
         //phone нужен для add form чтоб нельзя было подменить клиента
-        return  ['cars'=>$cars,'time'=>$req->time];
+        return  ['cars'=>$cars,'id'=>$client_id];
     }
     public function GetRules()
     {
@@ -75,13 +74,12 @@ class ViewAutoParkСontroller extends Controller
         if ($validator->fails()) {
             return response($validator->errors())->setStatusCode(500);//back()->withErrors($validator->errors())->withInput();
         }
-        //time = phone
-        $id_client_car = DB::table('clients')
-                            ->where('clients.phone','=',Crypt::decryptString($req->time))
-                            ->get('id_client_car')[0]->id_client_car;
+        $client_id = DB::table('clients')
+                            ->where('clients.id','=',$req->id)
+                            ->get('id')[0]->id;
 
         $data = [
-            'id_client_car'=>$id_client_car,
+            'client_id'=>$client_id,
             'mark'=>$req->mark,
             'model'=> $req->model,
             'color'=> $req->color,

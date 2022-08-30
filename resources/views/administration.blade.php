@@ -37,19 +37,13 @@
             <span class="badge badge-success rounded-pill d-inline">{{$client->phone}}</span>
         </td>
         <td>
-            <form action="{{route('edit_client_form',['phone'=>$client->phone,
-                                                    'mark'=>$client->mark,
-                                                    'gos_number'=>$client->gos_number]
-                                                    )}}" method="POST">
+            <form action="{{route('edit_client_form',['id'=>$client->id])}}" method="GET">
                 @csrf
                 <button type="submit" name="btn_edit" value="submit" class='btn'><img src="{{URL('img/edit.png') }}" width="35px" height="35px" ></button>
             </form>
         </td>
         <td>
-            <form action="{{route('del_client',['phone'=>$client->phone,
-                                                'mark'=>$client->mark,
-                                                'gos_number'=>$client->gos_number]
-                                                )}}" method="POST">
+            <form action="{{route('del_client',['id'=>$client->id])}}" method="GET">
                 @csrf
                 <button type="submit" name="btn_del"  class='btn'><img src="{{URL('img/del.png') }}" width="35px" height="35px"></button>
                 </form>
@@ -65,7 +59,7 @@
         </div>
         {{-- jump on form_client --}}
         <div class="col-2">
-            <form action="{{route('add_client_form')}}" method="POST">
+            <form action="{{route('add_client_form')}}" method="GET">
                 @csrf
                 <button type="submit"  class='btn btn-primary float-right text-white border'><b>Добавить клиента</b></button>
             </form>

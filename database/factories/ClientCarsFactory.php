@@ -24,7 +24,7 @@ class ClientCarsFactory extends Factory
         $faker->addProvider(new \Faker\Provider\Fakecar($faker));
         $br_md = $faker->vehicleArray; //brand and model
         return [
-            'id_client_car'=> Clients::inRandomOrder()->first(),
+            'client_id'=> Clients::inRandomOrder()->first(),
             'mark'=> $br_md['brand'],
             'model'=> $br_md['model'],
             'color'=> fake()->colorName('ru_RU'),

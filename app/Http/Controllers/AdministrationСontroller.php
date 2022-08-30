@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\ClientCars;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,11 +25,11 @@ class AdministrationСontroller extends Controller
             'cars.*.gos_number'=> 'required|max:9|unique:client_cars,gos_number',
         ];
     }
-    
+
     public function GetPanelAdministration()
     {
         return view('administration',['clients'=>$this->GetClients()]);
-    } 
+    }
 
     public function AddClientForm()
     {
@@ -49,14 +50,22 @@ class AdministrationСontroller extends Controller
         return view('add_client_form',['data'=>$data]);
     }
 
-    public function EditClientForm(Request $req)
+    public function EditClientForm(ClientCars $id)
     {
-        $data=(object)$this->GetClientAndCar($req->phone,$req->gos_number);
-        return view('edit_client_form',['data'=>$data]);
+        return view('edit_client_form');
+//        $data=(object)$this->GetClientAndCar($id);
+//        return view('edit_client_form',[
+//            'data'=>$data
+//            'car' => $car,
+//        ]);
+    }
+    public function GetClient(Request $req)
+    {
+        $client = DB::table('clients')->where('id','=',$req->id)->get();
+        return response()->json($client);
     }
 
-
-    public function GetClientAndCar($phone,$gos_number)
+    public function GetClientAndCar($car_id)
     {
         $id_client_car = DB::table('clients')
                             ->where('clients.phone','=',$phone)
@@ -80,94 +89,83 @@ class AdministrationСontroller extends Controller
             'gos_number'=> $db->gos_number,
             'car_in_place'=> $db->car_in_place,
             'add_cars' => [[]]
-        ]; 
+        ];
 
         return $data;
     }
 
     public function EditClient(Request $req)
     {
-        //set new rules
-       
+        //parse main car and new cars for add
         $rules = $this->GetRules();
-        $rules['phone']  = 'required|min:11|max:15|regex:/^([0-9]*)$/|';
-        $rules['gos_number'] = 'required|max:9';
-        $rules['add_cars.*.mark'] = 'required|min:2|max:50|regex:/^[a-zA-Zа-яА-ЯА-ЯёЁ\(\)\s]+$/u';
-        $rules['add_cars.*.model'] = 'required|max:50|regex:/^[0-9\s\a-zA-Zа-яА-ЯА-ЯёЁ]+$/u';
-        $rules['add_cars.*.color'] = 'required|max:50|regex:/^[a-zA-Zа-яА-ЯА-ЯёЁ]+$/u';
-        $rules['add_cars.*.gos_number'] = 'required|max:9|unique:client_cars,gos_number';
+        $rules['mark'] = '';
+        $rules['model'] = '';
+        $rules['color'] = '';
+        $rules['gos_number'] = '';
 
         $validator = Validator::make($req->all(), $rules);
-        $old_phone = Crypt::decryptString($req->date);
-        $old_gos_number = Crypt::decryptString($req->time);
-        
         //check errors
-        $errors = $validator->errors();
-        if( DB::table('clients')->where('phone','=',$req->phone)->exists()){
-            $errors->add('phone','The phone has already been taken');
-        }
 
         if ($validator->fails()) {
-            return view('edit_client_form',['data'=>$req,'errors'=>$validator->errors()]);
+            return response()->json(['errors'=>$validator->errors()]);
         }
-        
 
-        //change client 
+        $cars = $req->cars;
+        $main_car = $cars[0];
+        unset($cars[0]);
+
+        //change client
         $data = [
             'fio'=>$req->fio,
             'gender'=> $req->gender,
             'phone'=> $req->phone,
             'address'=> $req->address
         ];
-        
-        $db_clients = DB::table('clients')->where('phone','=',$old_phone);
-        $id_client_car = $db_clients->get()[0]->id_client_car;
+
+        $db_clients = DB::table('clients')->where('id','=',$req->id);
         $db_clients->update($data);
 
         //change first car
         $data = [
-            'id_client_car'=>$id_client_car,
-            'mark'=>$req->mark,
-            'model'=> $req->model,
-            'color'=> $req->color,
-            'gos_number'=> $req->gos_number,
-            'car_in_place'=> ($req->car_in_place == 'on') ? 1 : 0
-        ];    
+            'mark'=>$main_car['mark'],
+            'model'=> $main_car['model'],
+            'color'=> $main_car['color'],
+            'gos_number'=> $main_car['gos_number'],
+            'car_in_place'=> ($main_car['car_in_place']) ? 1 : 0
+        ];
+        $db_car = DB::table('client_cars')->where('id','=',$main_car['id']);
+        $db_car->update($data);
 
-        DB::table('client_cars')->where('gos_number','=',$old_gos_number)->update($data);
-
-        //add new car 
-        if($req->has('add_cars'))
+        //add new car
+        if(count($cars) != 0)
         {
-            foreach($req->add_cars as $new_car)
+            foreach($cars as $car)
             {
+                $car = json_decode($car);
                 $data = [
-                    'id_client_car'=>$id_client_car,
-                    'mark'=>$new_car['mark'],
-                    'model'=> $new_car['model'],
-                    'color'=> $new_car['color'],
-                    'gos_number'=> $new_car['gos_number'],
-                    'car_in_place'=> ($new_car['car_in_place'] == 'on') ? 1 : 0
-                ];  
+                    'mark'=>$car->mark,
+                    'model'=> $car->model,
+                    'color'=> $car->color,
+                    'gos_number'=> $car->gos_number,
+                    'car_in_place'=> ($car->car_in_place) ? 1 : 0
+                ];
                 DB::table('client_cars')->insert($data);
             }
         }
 
-        return redirect('administration')->with('status','Успешно сохранено!');
+        return response()->json(['status'=>'Успешно сохранено!']);
     }
 
     public function AddClient(Request $req)
     {
-        // @dd($req->all()); 
         $rules = $this->GetRules();
-        $rules['address'] = '';
         $rules['mark'] = '';
         $rules['model'] = '';
         $rules['color'] = '';
         $rules['gos_number'] = '';
         $validator = Validator::make($req->all(), $rules);
         if ($validator->fails()) {
-            return view('add_client_form',['data'=>$req->all(),'errors'=>$validator->errors()]);
+            return response()->json(['errors'=>$validator->errors()]);
         }
 
         $data = [
@@ -177,48 +175,36 @@ class AdministrationСontroller extends Controller
             'address'=> $req->address
         ];
 
-        $id_client_car = DB::table('clients')->insertGetId($data);
-
+        $client_id = DB::table('clients')->insertGetId($data);
         foreach($req->cars as $car)
-        {   
-            if(!array_key_exists('car_in_place',$car))
-            {
-                $car['car_in_place'] = 'off';
-            }
+        {
             $data = [
-                'id_client_car'=>$id_client_car,
+                'client_id'=>$client_id,
                 'mark'=>$car['mark'],
                 'model'=> $car['model'],
                 'color'=> $car['color'],
                 'gos_number'=> $car['gos_number'],
-                'car_in_place'=> ($car['car_in_place'] == 'on') ? 1 : 0
-            ];    
+                'car_in_place'=> ($car['car_in_place']) ? 1 : 0
+            ];
 
             DB::table('client_cars')->insert($data);
         }
-        return redirect('administration')->with('status','Успешно добавлено!');
+        return response()->json(['status'=>'Успешно сохранено!']);
     }
-    public function GetClients()    
+    public function GetClients()
     {
-        //paginate(?) сколько выводить клиентов 
+        //paginate(?) сколько выводить клиентов
         $clients = DB::table('clients')
-                        ->join('client_cars','clients.id_client_car','=','client_cars.id_client_car')
-                        ->select('clients.fio','clients.phone','client_cars.mark','client_cars.gos_number')
+                        ->join('client_cars','clients.id','=','client_cars.client_id')
+                        ->select('client_cars.id','clients.fio','clients.phone','client_cars.mark','client_cars.gos_number')
                         ->paginate(5);
 
         return $clients;
     }
 
-    public function DelClient(Request $req)
+    public function DelCarClient(ClientCars $id)
     {
-        $id_client_car = DB::table('clients')
-                    ->where('clients.phone','=',$req->phone) //unique
-                    ->get('id_client_car');
-        $del_car = DB::table('client_cars')
-                    ->where('client_cars.id_client_car','=',$id_client_car[0]->id_client_car) //навсякий
-                    ->where('client_cars.gos_number','=',$req->gos_number)
-                    ->delete();
-        
+        $id->delete();
         return redirect('administration');
     }
 }

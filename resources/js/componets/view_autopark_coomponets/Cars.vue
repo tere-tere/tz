@@ -14,18 +14,18 @@
             </thead>
 
             <tbody slot="body" class="" >
-            <tr class="" v-for="car in cars" :key="time">
+            <tr class="" v-for="car in cars" >
                 <td>{{ car.mark }}</td>
                 <td>{{ car.model }}</td>
                 <td>{{ car.color }}</td>
                 <td>{{ car.gos_number }}</td>
                 <td>
-                    <input class="form-check-input" type="checkbox" id="gridCheck1" v-model="car_in_place" :checked="car.car_in_place" >
+                    <input class="form-check-input" type="checkbox" id="gridCheck1" v-model="car.car_in_place"  true-value='1' :checked="car.car_in_place" >
                     <input class="hidden" type="hidden" name="time" value={{time}}>
                     <input type="hidden" name="car_in_place" value="off">
                 </td>
                 <td>
-                    <button type="submit" name="btn_del"  class="btn btn-light" value="save" width="35px" height="35px" @click="ChangeCarInPlace(car_in_place,time)" >Сохранить </button>
+                    <button type="submit" name="btn_del"  class="btn btn-light" value="save" width="35px" height="35px" @click="ChangeCarInPlace(car.car_in_place,car.gos_number)" >Сохранить </button>
                 </td>
 
             </tr>
@@ -76,7 +76,7 @@
                     <input type="text" name="gos_number" class="form-control" id="inputAddress4" placeholder="В732ГГ 34" ref="gos_number">
                 </td>
                 <td>
-                    <input class="hidden" type="hidden" name="time" value={{time}} ref="time">
+                    <input class="hidden" type="hidden" name="time" value={{id}} ref="time">
                     <input type="hidden" name="car_in_place" value="off">
                     <input class="form-check-input" name="car_in_place" type="checkbox" id="gridCheck1" ref="car_in_place">
                 </td>
@@ -99,22 +99,22 @@ export default {
     props:{
         id_client: null,
         cars: [],
-        time: null
+        id: null
 
     },
     methods:
     {
-        ChangeCarInPlace(car_in_place,time)
+        ChangeCarInPlace(car_in_place,gos_number)
         {
             axios.post('/api/view_autopark/change_cip', {
                     car_in_place: car_in_place,
-                    time: time
+                    gos_number:gos_number
             });
         },
         AddNewCar(new_car)
         {
-            // console.log(new_car);
             axios.post('/api/view_autopark/add_car', {
+                id: this.id,
                 mark: new_car["mark"].value,
                 model: new_car["model"].value,
                 color: new_car["color"].value,
@@ -127,7 +127,7 @@ export default {
                    model: new_car["model"].value,
                    color: new_car["color"].value,
                    gos_number: new_car["gos_number"].value,
-                   car_in_place: new_car["car_in_place"].checked
+                   car_in_place: new_car["car_in_place"].checked ? '1' : '0'
                });
 3
 

@@ -17,12 +17,12 @@
             </thead>
 
             <tbody slot="body" class="" >
-                <tr v-for="client in searchRow" :key="client.time" @click="SelectedRowClientClick(client.time)" :class="{'table-success': (client.time == selectedClient)}">
+                <tr v-for="client in searchRow" :key="client.id" @click="SelectedRowClientClick(client.id)" :class="{'table-success': (client.id == selectedClient)}">
                     <td>{{ client.fio }}</td>
                     <td>{{ client.gender }}</td>
                     <td>{{ client.phone }}</td>
                     <td>{{ client.address }}
-                             <input class="hidden" type="hidden" name="time" value={{client.time}}>
+                             <input class="hidden" type="hidden" name="id" value={{client.id}}>
                     </td>
                 </tr>
             </tbody>

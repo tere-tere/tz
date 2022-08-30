@@ -19,7 +19,7 @@
     </style>
 
     <div id="app">
-
+        <viewautopark></viewautopark>
     </div>
 
 
@@ -27,3 +27,4 @@
 
 
 @endsection
+
