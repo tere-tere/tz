@@ -41,22 +41,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('client_cars', function (Blueprint $table) {
-//            $table->dropForeign(['client_id']);
-            $table->dropColumn('client_id');
-            $table->dropColumn('id');
-        });
-        Schema::table('clients', function (Blueprint $table) {
-            $table->dropColumn('id');
-        });
-        Schema::table('clients', function (Blueprint $table) {
-            $table->mediumIncrements('id_client_car')->first();
 
-        });
-        Schema::table('client_cars', function (Blueprint $table) {
-            $table->unsignedMediumInteger('id_client_car');
-            $table->foreign('id_client_car')->references('id_client_car')->on('clients');
-
-        });
     }
 };

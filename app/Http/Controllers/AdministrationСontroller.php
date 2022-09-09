@@ -53,11 +53,6 @@ class AdministrationСontroller extends Controller
     public function EditClientForm(ClientCars $id)
     {
         return view('edit_client_form');
-//        $data=(object)$this->GetClientAndCar($id);
-//        return view('edit_client_form',[
-//            'data'=>$data
-//            'car' => $car,
-//        ]);
     }
     public function GetClient(Request $req)
     {
@@ -103,9 +98,19 @@ class AdministrationСontroller extends Controller
         $rules['color'] = '';
         $rules['gos_number'] = '';
 
-        $validator = Validator::make($req->all(), $rules);
-        //check errors
+        $db_clients = DB::table('clients')->where('id','=',$req->id);
+        $db_car = DB::table('client_cars')->where('id','=',$req->cars[0]['id']);
 
+        //если меняется все остальное, кроме телефона и номера
+        if($req->phone == $db_clients->get('phone')[0]->phone){
+            $rules['phone'] = 'required|min:11|max:15|regex:/^([0-9]*)$/';
+        }
+        if($req->cars[0]['gos_number'] == $db_car->get('gos_number')[0]->gos_number) {
+            $rules['cars.0.gos_number'] = 'required|max:9';
+        }
+
+        //check errors
+        $validator = Validator::make($req->all(), $rules);
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()]);
         }
@@ -122,7 +127,6 @@ class AdministrationСontroller extends Controller
             'address'=> $req->address
         ];
 
-        $db_clients = DB::table('clients')->where('id','=',$req->id);
         $db_clients->update($data);
 
         //change first car
@@ -163,6 +167,7 @@ class AdministrationСontroller extends Controller
         $rules['model'] = '';
         $rules['color'] = '';
         $rules['gos_number'] = '';
+
         $validator = Validator::make($req->all(), $rules);
         if ($validator->fails()) {
             return response()->json(['errors'=>$validator->errors()]);

@@ -73,5 +73,8 @@ export default {
 </script>
 
 <style scoped>
-
+    .scrollable {
+        overflow-y: scroll;
+        max-height: 220px;
+    }
 </style>

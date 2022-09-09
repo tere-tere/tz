@@ -19,6 +19,7 @@ class ClientCarsSeeder extends Seeder
         Clients::factory(10)->create()->each(function($client){
             ClientCars::factory(rand(1,3))->create([
                 'client_id' => $client->id
+
             ]);
         });
 

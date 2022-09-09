@@ -151,5 +151,7 @@ export default {
 </script>
 
 <style scoped>
-
+    .center-row{
+        text-align: center;
+    }
 </style>

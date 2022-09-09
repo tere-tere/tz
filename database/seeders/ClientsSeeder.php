@@ -15,7 +15,5 @@ class ClientsSeeder extends Seeder
      */
     public function run()
     {
-        // указывает кол-во в clientcars
-//         Clients::factory(1)->create();
     }
 }

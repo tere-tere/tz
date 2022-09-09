@@ -16,12 +16,10 @@ use App\Http\Controllers\ViewAutoParkСontroller;
 
 Route::middleware(['auth'])->group(function(){
 
+    //administration
     Route::get('/administration',[AdministrationСontroller::class,'GetPanelAdministration']);
-
     Route::get('/administration/edit_client_form/{id}',[AdministrationСontroller::class,'EditClientForm'])->name('edit_client_form');
-
     Route::get('/administration/add_client_form',[AdministrationСontroller::class,'AddClientForm'])->name('add_client_form');
-
     Route::get('/administration/delete/{id}',[AdministrationСontroller::class,'DelCarClient'])->name('del_client');
 
     ///autopark

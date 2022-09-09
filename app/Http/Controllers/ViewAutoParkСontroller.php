@@ -10,34 +10,22 @@ class ViewAutoParkСontroller extends Controller
 {
     public function ViewAutoPark()
     {
-//        return view('view_autopark',['clients_car'=>$this->GetClientsAndCar()]);
         return view('view_autopark');
     }
     public function GetClients()
     {
-        $clients = DB::table('clients')
-                        ->get();
-
-
-        //тут шифруем телефоны и там добавляем в таблицу, чтоб нельзя было подменить
-        foreach($clients as $client)
-        {
-            $client->time = Crypt::encryptString($client->phone);
-        }
+        $clients = DB::table('clients')->get();
 
         return $clients;
     }
 
     public function ChangeCarInPlace(Request $req)
     {
-
         DB::table('client_cars')->where('client_cars.gos_number','=',$req->gos_number)->update(['client_cars.car_in_place'=>($req->car_in_place) ? 1 : 0]);
         return response()->json(['status'=>'Машина добавлена!']);
     }
     public function GetDefinedCar(Request $req)
     {
-        //при запросе(с арг телефоном) выдает все машины килента
-        //phone = time
         $client_id = DB::table('clients')
                             ->where('clients.id','=',  $req->id)
                             ->get('id')[0]->id;
@@ -48,14 +36,6 @@ class ViewAutoParkСontroller extends Controller
                             ->get();
 
 
-
-        // добавляем time а в него шифруем gos_number, нужно нельзя было подделать, т.е. в таблице подменить
-        foreach($cars as $car)
-        {
-            $car->time= Crypt::encryptString($car->gos_number);
-        }
-
-        //phone нужен для add form чтоб нельзя было подменить клиента
         return  ['cars'=>$cars,'id'=>$client_id];
     }
     public function GetRules()
@@ -72,7 +52,7 @@ class ViewAutoParkСontroller extends Controller
         //проверка
         $validator = Validator::make($req->all(), $this->GetRules());
         if ($validator->fails()) {
-            return response($validator->errors())->setStatusCode(500);//back()->withErrors($validator->errors())->withInput();
+            return response($validator->errors())->setStatusCode(500);
         }
         $client_id = DB::table('clients')
                             ->where('clients.id','=',$req->id)

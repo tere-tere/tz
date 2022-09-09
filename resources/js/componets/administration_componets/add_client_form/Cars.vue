@@ -14,13 +14,21 @@
             </div>
 
             <div class="form-row">
-                <div class='col-6'>
+                <div class="col-6">
                     <label for="inputAddress2">Марка</label>
-                    <input type="text" name='mark' class="form-control" id="inputAddress2" placeholder="Audi" v-model="cars[index].mark">
+                    <select class="form-control" v-model="cars[index].mark" @input="onChangeMark($event,cars[index])">
+                        <option v-for="mark in marks">
+                            {{ mark.name }}
+                        </option>
+                    </select>
                 </div>
-                <div class='col-6'>
-                    <label for="inputAddress">Модель</label>
-                    <input type="text" name='model' class="form-control" id="inputAddress" placeholder="S1" v-model="cars[index].model">
+                <div class="col-6">
+                    <label for="inputAddress2">Модель</label>
+                    <select class="form-control" v-model="cars[index].model">
+                        <option v-for="model in models"  :key="model.name">
+                            {{ model.name }}
+                        </option>
+                    </select>
                 </div>
             </div>
 
@@ -56,10 +64,17 @@ export default {
     name: "Cars",
     data() {
         return {
-            cars: []
+            cars: [],
+            marks: [],
+            models: [],
+            selected_mark: ''
         }
     },
-    created() {
+    mounted() {
+        axios.get('/api/handbookcar/get_marks').then(response => {
+            this.marks = response.data;
+        });
+
         this.cars.push(
             {
                 mark:'',
@@ -71,12 +86,28 @@ export default {
         );
     },
     methods: {
-
+        GetAndSetModelsInSelect(name,car)
+        {
+            axios.get('/api/handbookcar/get_models',{
+                params: {
+                    name: name
+                }
+            }).then(response => {
+                if(car != null) {
+                    car.model = response.data[0].name;
+                }
+                this.models = response.data;
+            });
+        },
+        onChangeMark(selected,car)
+        {
+            this.GetAndSetModelsInSelect(selected.target.value,car);
+        },
         AddInputNewCar()
         {
             this.cars.push(
                 {
-                    mark:'',
+                    mark: '',
                     model:'',
                     color:'',
                     gos_number:'',

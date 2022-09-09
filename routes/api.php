@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ViewAutoParkСontroller;
 use App\Http\Controllers\AdministrationСontroller;
+use App\Http\Controllers\HandbookCar;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,3 +33,6 @@ Route::get('/administration/get_car',[AdministrationСontroller::class,'GetClien
 Route::put('/administration/edit_client_form/edit',[AdministrationСontroller::class,'EditClient'])->name('edit_client');
 Route::post('/administration/add_client_form/add',[AdministrationСontroller::class,'AddClient'])->name('add_client');
 
+//HandbookCar adminsitration + viewautopark
+Route::get('/handbookcar/get_marks',[HandbookCar::class,'GetMarks']);
+Route::get('/handbookcar/get_models',[HandbookCar::class,'GetModels']);
